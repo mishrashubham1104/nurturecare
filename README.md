@@ -1,6 +1,6 @@
 # NurtureCare - Full-Stack Home Nursing Website
 
-A production-ready nursing care platform built with **React.js** (frontend) + **Node.js/Express** (backend), with **Framer Motion** animations throughout.
+A nursing care platform built with **React.js** (frontend) + **Node.js/Express** (backend), with **Framer Motion** animations throughout.
 
 ## Project Structure
 ```
@@ -91,3 +91,8 @@ npm start
 - **Frontend**: React 18, React Router v6, Framer Motion, Axios
 - **Backend**: Node.js, Express 4, CORS, body-parser
 - **Fonts**: Google Fonts (Playfair Display, DM Sans)
+
+- # .env.example
+MONGO_URI=your_mongodb_connection_string_here
+JWT_SECRET=your_secret_key_here
+REACT_APP_API_URL=http://localhost:5000
