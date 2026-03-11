@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,7 +42,7 @@ export default function Navbar() {
         style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
           background: navBg, backdropFilter: scrolled ? "blur(14px)" : "none",
           boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.25)" : "none",
-          transition: "all 0.3s ease", padding: "0 24px", display: "flex",
+          transition: "all 0.3s ease", padding: "0 32px", display: "flex",
           alignItems: "center", justifyContent: "space-between", height: 68 }}>
 
         {/* Logo */}
@@ -55,13 +54,14 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop links */}
-        <div style={{ display: "flex", gap: 28, alignItems: "center" }} className="desktop-nav">
+        <div style={{ display: "flex", gap: 32, alignItems: "center", flexShrink: 0 }} className="desktop-nav">
           {navLinks.map(({ label, path }) => (
             <Link key={path} to={path} style={{ textDecoration: "none" }}>
               <motion.span whileHover={{ color: "#00CEC3" }}
                 style={{ color: location.pathname === path ? "#00CEC3" : "rgba(255,255,255,0.8)",
                   fontSize: 14, fontWeight: location.pathname === path ? 700 : 500,
-                  fontFamily: "'DM Sans', sans-serif", transition: "color 0.2s", cursor: "pointer" }}>
+                  fontFamily: "'DM Sans', sans-serif", transition: "color 0.2s", cursor: "pointer",
+                  whiteSpace: "nowrap", letterSpacing: "0.01em" }}>
                 {label}
               </motion.span>
             </Link>

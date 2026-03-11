@@ -1,4 +1,4 @@
-
+import "./responsive.css";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { AppProvider }         from "./context/AppContext";
@@ -47,7 +47,7 @@ function RoleRoute({ children, allowedRoles }) {
 // Hide Navbar/Footer on dashboard pages
 function Layout({ children }) {
   const { pathname } = useLocation();
-  const isDashboard  = pathname.startsWith("/admin") || pathname.startsWith("/caregiver");
+  const isDashboard  = pathname.startsWith("/admin") || pathname === "/caregiver/dashboard" || pathname.startsWith("/caregiver/");
   const theme        = useTheme();
   return (
     <div style={{ background:theme.bg, minHeight:"100vh", transition:"background 0.3s" }}>
@@ -73,6 +73,22 @@ function AppShell() {
         ::-webkit-scrollbar-thumb{background:#00A99D;border-radius:3px}
         select option{background:${theme.bgCard};color:${theme.text}}
         @media(max-width:900px){.desktop-nav{display:none!important}.hamburger{display:flex!important}}
+        @media(max-width:768px){
+          .hero-grid{grid-template-columns:1fr!important;padding:80px 20px 0!important;gap:32px!important;text-align:center}
+          .hero-cta-buttons{justify-content:center!important}
+          .hero-stats{justify-content:center!important}
+          .hero-card-col{display:none!important}
+          .stats-grid{grid-template-columns:repeat(2,1fr)!important;padding:24px 16px!important}
+          .services-grid{grid-template-columns:repeat(2,1fr)!important}
+          .pricing-grid{grid-template-columns:repeat(2,1fr)!important}
+          .contact-grid{grid-template-columns:1fr!important}
+          .service-detail-grid{grid-template-columns:1fr!important}
+        }
+        @media(max-width:560px){
+          .services-grid{grid-template-columns:1fr!important}
+          .pricing-grid{grid-template-columns:1fr!important}
+          .caregivers-grid{grid-template-columns:1fr!important}
+        }
       `}</style>
       <BrowserRouter>
         <ScrollToTop />

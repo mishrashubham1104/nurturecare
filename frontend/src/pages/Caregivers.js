@@ -47,7 +47,7 @@ export default function Caregivers() {
         ) : (
           <motion.div variants={stagger} initial="hidden" animate="show" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 28 }}>
             {filtered.map((cg) => (
-              <motion.div key={cg.id} variants={fadeUp}
+              <motion.div key={cg.id || cg._id} variants={fadeUp}
                 whileHover={{ y: -8, boxShadow: "0 24px 60px rgba(0,0,0,0.12)" }}
                 onClick={() => navigate(`/caregivers/${cg.id}`)}
                 style={{ background: COLORS.white, borderRadius: 24, padding: 32, cursor: "pointer", border: "1px solid rgba(0,0,0,0.06)", textAlign: "center" }}>
