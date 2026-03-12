@@ -8,7 +8,7 @@ const SOCIAL = [
   // { name: "Facebook",  img: facebookLogo,  url: "https://facebook.com/nurturecare",           bg: "#1877F2" },
   // { name: "Instagram", img: instagramLogo, url: "https://instagram.com/nurturecare",          bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)" },
   { name: "Twitter",   emoji: "𝕏",         url: "https://twitter.com/nurturecare",            bg: "#000" },
-  { name: "LinkedIn",  emoji: "in",         url: "https://linkedin.com/company/nurturecare",   bg: "#0A66C2" },
+  { name: "LinkedIn",  emoji: "in",         url: "https://linkedin.com",   bg: "#0A66C2" },
 ];
 
 const COLS = [

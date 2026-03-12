@@ -1,4 +1,3 @@
-
 const express    = require("express");
 const cors       = require("cors");
 const bodyParser = require("body-parser");
@@ -6,6 +5,11 @@ const mongoose   = require("mongoose");
 const bcrypt     = require("bcryptjs");
 const jwt        = require("jsonwebtoken");
 require("dotenv").config();
+const {
+  sendAdminCaregiverNotification,
+  sendCaregiverApprovedEmail,
+  sendCaregiverRejectedEmail,
+} = require("./utils/emailService");
 
 const app        = express();
 const PORT       = process.env.PORT || 5000;
@@ -237,6 +241,15 @@ app.post("/api/caregiver/register", auth, caregiverOnly, async (req, res) => {
       status: "pending",
     });
     console.log("✅ Caregiver profile submitted | ID:", caregiverId);
+
+    // ── Notify admin by email ──────────────────────────────────────────────
+    try {
+      await sendAdminCaregiverNotification(cg);
+    } catch (emailErr) {
+      // Email failure must NOT block the API response
+      console.error("⚠️  Admin notification email failed:", emailErr.message);
+    }
+
     res.status(201).json({ success: true, message: "Profile submitted. Pending admin verification.", caregiver: cg });
   } catch (err) { res.status(500).json({ error: "Failed to submit profile: " + err.message }); }
 });
@@ -477,6 +490,18 @@ app.patch("/api/admin/caregivers/:caregiverId/verify", auth, adminOnly, async (r
       { new: true }
     );
     if (!cg) return res.status(404).json({ error: "Caregiver not found" });
+
+    // ── Email the caregiver about the decision ─────────────────────────────
+    try {
+      if (status === "verified") {
+        await sendCaregiverApprovedEmail(cg, verificationNote);
+      } else if (status === "rejected") {
+        await sendCaregiverRejectedEmail(cg, verificationNote);
+      }
+    } catch (emailErr) {
+      console.error("⚠️  Caregiver decision email failed:", emailErr.message);
+    }
+
     res.json({ success: true, caregiver: cg });
   } catch { res.status(500).json({ error: "Failed to update caregiver." }); }
 });

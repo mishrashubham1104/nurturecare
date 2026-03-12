@@ -1,8 +1,161 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
+
+/* ── All 6 services — kept in sync with backend ─────────── */
+const SERVICE_ITEMS = [
+  { icon: "🏥", title: "Post-Surgery Care",      desc: "Recovery support after hospital discharge",   slug: "post-surgery"   },
+  { icon: "👴", title: "Elderly Care",            desc: "Daily assistance & companionship for seniors", slug: "elderly-care"   },
+  { icon: "🧑‍⚕️", title: "ICU at Home",           desc: "Critical care with advanced equipment",        slug: "icu-at-home"    },
+  { icon: "💊", title: "Medication Management",  desc: "Safe, timely medication administration",       slug: "medication"     },
+  { icon: "🩺", title: "Physiotherapy",          desc: "In-home rehab & mobility recovery",            slug: "physiotherapy"  },
+  { icon: "🧠", title: "Dementia Care",           desc: "Specialist support for memory conditions",     slug: "dementia-care"  },
+];
+
+function ServicesDropdown({ active, navigate }) {
+  const [open, setOpen] = useState(false);
+  const ref             = useRef(null);
+  const closeTimer      = useRef(null);
+
+  const handleMouseEnter = () => {
+    clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+  const handleMouseLeave = () => {
+    /* Small delay so cursor can move into the dropdown panel */
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ position: "relative" }}
+    >
+      {/* Trigger */}
+      <div
+        onClick={() => navigate("/services")}
+        style={{
+          display: "flex", alignItems: "center", gap: 5,
+          color: active ? "#00CEC3" : "rgba(255,255,255,0.85)",
+          fontSize: 14, fontWeight: active ? 700 : 500,
+          fontFamily: "'DM Sans', sans-serif",
+          cursor: "pointer", whiteSpace: "nowrap",
+          transition: "color 0.2s",
+          userSelect: "none",
+        }}
+      >
+        Services
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ fontSize: 9, opacity: 0.7, display: "inline-block" }}
+        >
+          ▼
+        </motion.span>
+      </div>
+
+      {/* Dropdown panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0,  scale: 1    }}
+            exit={{    opacity: 0, y: 10, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 16px)",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 480,
+              background: "rgba(11,29,58,0.98)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(0,169,157,0.25)",
+              borderRadius: 20,
+              padding: 16,
+              boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
+              zIndex: 300,
+            }}
+          >
+            {/* Arrow pointer */}
+            <div style={{
+              position: "absolute", top: -7, left: "50%",
+              transform: "translateX(-50%)",
+              width: 14, height: 14,
+              background: "rgba(11,29,58,0.98)",
+              border: "1px solid rgba(0,169,157,0.25)",
+              borderRight: "none", borderBottom: "none",
+              rotate: "45deg",
+            }} />
+
+            {/* Header */}
+            <div style={{ padding: "4px 8px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#00A99D", letterSpacing: 1.5, textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+                Our Services
+              </span>
+            </div>
+
+            {/* 2-col grid of service items */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
+              {SERVICE_ITEMS.map((s) => (
+                <motion.div
+                  key={s.slug}
+                  whileHover={{ background: "rgba(0,169,157,0.12)", x: 2 }}
+                  onClick={() => { navigate(`/services/${s.slug}`); setOpen(false); }}
+                  style={{
+                    display: "flex", alignItems: "flex-start", gap: 12,
+                    padding: "11px 12px", borderRadius: 12, cursor: "pointer",
+                    background: "rgba(0,0,0,0)",
+                    transition: "background 0.15s",
+                  }}
+                >
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: "rgba(0,169,157,0.15)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 18,
+                  }}>
+                    {s.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
+                      {s.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
+                      {s.desc}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Footer CTA */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 8, paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 8px 4px" }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif" }}>
+                All services include verified nurses
+              </span>
+              <motion.button
+                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+                onClick={() => { navigate("/services"); setOpen(false); }}
+                style={{
+                  background: "#00A99D", color: "#fff", border: "none",
+                  borderRadius: 8, padding: "7px 16px", fontSize: 12,
+                  fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                View All →
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
@@ -84,21 +237,25 @@ export default function Navbar() {
         {/* ── Desktop nav links ── */}
         {!isMobile && (
           <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
-            {navLinks.map(({ label, path }) => (
-              <Link key={path} to={path} style={{ textDecoration: "none" }}>
-                <motion.span
-                  whileHover={{ color: "#00CEC3" }}
-                  style={{
-                    color: location.pathname === path ? "#00CEC3" : "rgba(255,255,255,0.85)",
-                    fontSize: 14, fontWeight: location.pathname === path ? 700 : 500,
-                    fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                    whiteSpace: "nowrap", transition: "color 0.2s",
-                  }}
-                >
-                  {label}
-                </motion.span>
-              </Link>
-            ))}
+            {navLinks.map(({ label, path }) =>
+              label === "Services"
+                ? <ServicesDropdown key={path} active={location.pathname.startsWith("/services")} navigate={navigate} />
+                : (
+                  <Link key={path} to={path} style={{ textDecoration: "none" }}>
+                    <motion.span
+                      whileHover={{ color: "#00CEC3" }}
+                      style={{
+                        color: location.pathname === path ? "#00CEC3" : "rgba(255,255,255,0.85)",
+                        fontSize: 14, fontWeight: location.pathname === path ? 700 : 500,
+                        fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                        whiteSpace: "nowrap", transition: "color 0.2s",
+                      }}
+                    >
+                      {label}
+                    </motion.span>
+                  </Link>
+                )
+            )}
           </div>
         )}
 

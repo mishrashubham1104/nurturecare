@@ -38,7 +38,12 @@ function ScrollToTop() {
 function RoleRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
   const location = useLocation();
-  if (loading) return null;
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0B1D3A" }}>
+      <div style={{ width: 40, height: 40, border: "3px solid rgba(0,169,157,0.2)", borderTopColor: "#00A99D", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
   if (!allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
   return children;
@@ -72,7 +77,7 @@ function AppShell() {
         ::-webkit-scrollbar-track{background:#0B1D3A}
         ::-webkit-scrollbar-thumb{background:#00A99D;border-radius:3px}
         select option{background:${theme.bgCard};color:${theme.text}}
-        @media(max-width:900px){.desktop-nav{display:none!important}.hamburger{display:flex!important}}
+        @media(max-width:900px){.desktop-nav{display:none!important}}
         @media(max-width:768px){
           .hero-grid{grid-template-columns:1fr!important;padding:80px 20px 0!important;gap:32px!important;text-align:center}
           .hero-cta-buttons{justify-content:center!important}
