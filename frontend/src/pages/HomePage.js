@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
@@ -45,7 +44,7 @@ export default function HomePage() {
         ))}
         <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(0,169,157,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,169,157,0.04) 1px,transparent 1px)", backgroundSize: "48px 48px" }} />
 
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 2, paddingTop: 80 }}>
+        <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 2 }}>
           <motion.div initial="hidden" animate="show" variants={stagger}>
             <motion.div variants={fadeUp} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(0,169,157,0.15)", border: "1px solid rgba(0,169,157,0.3)", borderRadius: 40, padding: "6px 16px", marginBottom: 24 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.teal, display: "inline-block" }} />
@@ -77,7 +76,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          <motion.div style={{ y: heroY }} initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}>
+          <motion.div className="hero-card-col" style={{ y: heroY }} initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}>
             <div style={{ position: "relative" }}>
               <div style={{ background: "linear-gradient(135deg,rgba(0,169,157,0.15) 0%,rgba(11,29,58,0.8) 100%)", border: "1px solid rgba(0,169,157,0.25)", borderRadius: 24, padding: 32, backdropFilter: "blur(20px)" }}>
                 <div style={{ fontSize: 96, textAlign: "center", marginBottom: 16 }}>👩‍⚕️</div>
@@ -118,7 +117,7 @@ export default function HomePage() {
 
       {/* STATS */}
       <div style={{ background: COLORS.teal, padding: "32px 48px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
+        <div className="stats-grid" style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
           {STATS.map(({ value, label }) => (
             <div key={label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 36, fontWeight: 900, color: COLORS.white, fontFamily: "'DM Sans', sans-serif" }}>{value}</div>
@@ -135,7 +134,7 @@ export default function HomePage() {
             <span style={{ color: COLORS.teal, fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: 2, fontFamily: "'DM Sans', sans-serif" }}>What We Offer</span>
             <h2 style={{ fontSize: 48, fontWeight: 900, color: COLORS.navy, margin: "12px 0 16px", fontFamily: "'Playfair Display', Georgia, serif" }}>Comprehensive Home Care</h2>
           </motion.div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
+          <div className="services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
             {(services.length ? services : [{icon:"🏥",title:"Post-Surgery Care",desc:"Professional at-home recovery support.",color:"#E8F6FF"},{icon:"👴",title:"Elderly Care",desc:"Compassionate daily living assistance.",color:"#FFF0F5"},{icon:"🧑‍⚕️",title:"ICU at Home",desc:"Critical care at home.",color:"#F0FFF4"},{icon:"💊",title:"Medication Management",desc:"Timely medication administration.",color:"#FFFBEB"},{icon:"🩺",title:"Physiotherapy",desc:"In-home physiotherapy sessions.",color:"#F5F0FF"},{icon:"🧠",title:"Dementia Care",desc:"Specialized memory care.",color:"#FFF5F0"}]).map((svc, i) => (
               <motion.div key={svc.title} variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 24px 60px rgba(0,0,0,0.12)" }}
                 onClick={() => navigate(`/services/${svc.slug || svc.title.toLowerCase().replace(/\s+/g,"-")}`)}

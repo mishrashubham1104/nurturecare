@@ -1,0 +1,300 @@
+/* ============================================================
+   NurtureCare – responsive.css
+   Fixes all mobile/tablet layout issues across the app
+   ============================================================ */
+
+/* ── Base resets ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+img, video { max-width: 100%; height: auto; }
+
+/* ── Viewport meta helper (set in index.html too) ─────────── */
+body { overflow-x: hidden; }
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+@media (max-width: 900px) {
+  .desktop-nav { display: none !important; }
+  .hamburger   { display: flex !important; }
+}
+
+/* ============================================================
+   HERO SECTION  (gridTemplateColumns: "1fr 1fr")
+   ============================================================ */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding: 0 48px;
+  padding-top: 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+    padding: 0 20px !important;
+    padding-top: 100px !important;
+    text-align: center;
+  }
+
+  .hero-grid h1 {
+    font-size: 40px !important;
+  }
+
+  .hero-grid .hero-card { display: none !important; }
+
+  .hero-cta-buttons {
+    justify-content: center !important;
+  }
+
+  .hero-stats {
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-grid h1 { font-size: 32px !important; }
+}
+
+/* ============================================================
+   STATS BAR  (gridTemplateColumns: "repeat(4,1fr)")
+   ============================================================ */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+    padding: 32px 20px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* ============================================================
+   SERVICES GRID  (repeat(3, 1fr))
+   ============================================================ */
+@media (max-width: 900px) {
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   CAREGIVERS GRID
+   ============================================================ */
+@media (max-width: 900px) {
+  .caregivers-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .caregivers-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   SERVICE DETAIL  (gridTemplateColumns: "1fr 1fr")
+   ============================================================ */
+@media (max-width: 768px) {
+  .service-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   PRICING CARDS  (repeat(3,1fr))
+   ============================================================ */
+@media (max-width: 900px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   HOW IT WORKS  (repeat(3,1fr) / repeat(4,1fr))
+   ============================================================ */
+@media (max-width: 900px) {
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   BOOKING PAGE layout
+   ============================================================ */
+@media (max-width: 900px) {
+  .booking-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   ADMIN / CAREGIVER DASHBOARDS
+   ============================================================ */
+@media (max-width: 900px) {
+  .dashboard-layout {
+    flex-direction: column !important;
+  }
+
+  .dashboard-sidebar {
+    width: 100% !important;
+    min-height: auto !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .dashboard-content {
+    padding: 20px !important;
+  }
+
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   CONTACT PAGE  (two-column layout)
+   ============================================================ */
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   FOOTER  (repeat(4,1fr) / repeat(5,1fr))
+   ============================================================ */
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   GENERIC SECTION PADDING
+   ============================================================ */
+@media (max-width: 768px) {
+  section, .section-pad {
+    padding: 60px 20px !important;
+  }
+
+  .section-heading {
+    font-size: 32px !important;
+  }
+
+  .page-hero-title {
+    font-size: 36px !important;
+  }
+
+  .page-hero-pad {
+    padding: 60px 20px 72px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-heading  { font-size: 26px !important; }
+  .page-hero-title  { font-size: 28px !important; }
+}
+
+/* ============================================================
+   BOOKING MODAL
+   ============================================================ */
+@media (max-width: 600px) {
+  .booking-modal-inner {
+    padding: 24px 16px !important;
+    margin: 12px !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ============================================================
+   TABLES  (my-bookings, admin dashboard)
+   ============================================================ */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ============================================================
+   TESTIMONIALS SECTION
+   ============================================================ */
+@media (max-width: 768px) {
+  .testimonial-card {
+    padding: 28px 20px !important;
+  }
+
+  .testimonial-text {
+    font-size: 16px !important;
+  }
+}
+
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+@media (max-width: 560px) {
+  .login-card {
+    padding: 28px 20px !important;
+    margin: 16px !important;
+  }
+}
+
+/* ============================================================
+   GENERAL UTILITY
+   ============================================================ */
+.w-full-mobile {
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: block !important; }
+  .flex-col-mobile { flex-direction: column !important; }
+  .text-center-mobile { text-align: center !important; }
+  .full-width-mobile { width: 100% !important; }
+  .px-mobile { padding-left: 16px !important; padding-right: 16px !important; }
+}

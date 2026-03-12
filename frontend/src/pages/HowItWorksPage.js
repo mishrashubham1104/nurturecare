@@ -1,7 +1,7 @@
-
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { COLORS, fadeUp, stagger } from "../constants";
+import { COLORS, fadeUp } from "../constants";
+import { useTheme } from "../context/ThemeContext";
 
 const STEPS = [
   { step: "01", icon: "📋", title: "Share Your Needs", desc: "Fill out a quick form with patient details, care requirements, and your preferred schedule. Takes less than 2 minutes.", detail: "Tell us about the patient's condition, the type of care needed, and when you need care to start. Our smart matching system will find the best nurse for you." },
@@ -21,12 +21,14 @@ const FAQS = [
 
 export default function HowItWorksPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
+
   return (
-    <div style={{ background: COLORS.cream, minHeight: "100vh", paddingTop: 100 }}>
-      <div style={{ background: COLORS.navy, padding: "80px 48px 96px" }}>
+    <div style={{ background: theme.bg, minHeight: "100vh", paddingTop: 100, transition: "background 0.3s" }}>
+      <div style={{ background: COLORS.navy, padding: "clamp(48px,8vw,80px) clamp(20px,5vw,48px) clamp(60px,10vw,96px)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            style={{ fontSize: 56, fontWeight: 900, color: COLORS.white, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 16px" }}>
+            style={{ fontSize: "clamp(32px,6vw,56px)", fontWeight: 900, color: COLORS.white, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 16px" }}>
             How It Works
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -36,26 +38,26 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "64px 24px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(40px,6vw,64px) clamp(16px,4vw,24px)" }}>
         {STEPS.map((step, i) => (
           <motion.div key={step.step} initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ display: "flex", gap: 32, marginBottom: 48, alignItems: "flex-start" }}>
-            <div style={{ flexShrink: 0, width: 80, height: 80, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.teal}, ${COLORS.tealLight})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, boxShadow: "0 8px 24px rgba(0,169,157,0.3)" }}>
+            style={{ display: "flex", gap: 24, marginBottom: 40, alignItems: "flex-start", flexWrap: "wrap" }}>
+            <div style={{ flexShrink: 0, width: 72, height: 72, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.teal}, ${COLORS.tealLight})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, boxShadow: "0 8px 24px rgba(0,169,157,0.3)" }}>
               {step.icon}
             </div>
-            <div style={{ background: COLORS.white, borderRadius: 20, padding: 28, flex: 1, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+            <div style={{ background: theme.bgCard, borderRadius: 20, padding: "clamp(20px,3vw,28px)", flex: 1, minWidth: 240, boxShadow: theme.shadow, border: `1px solid ${theme.border}`, transition: "background 0.3s" }}>
               <div style={{ color: COLORS.teal, fontSize: 13, fontWeight: 800, fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>STEP {step.step}</div>
-              <h3 style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, margin: "0 0 8px", fontFamily: "'DM Sans', sans-serif" }}>{step.title}</h3>
-              <p style={{ fontSize: 16, color: COLORS.slate, lineHeight: 1.6, margin: "0 0 12px", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>{step.desc}</p>
-              <p style={{ fontSize: 14, color: COLORS.slate, lineHeight: 1.7, margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{step.detail}</p>
+              <h3 style={{ fontSize: "clamp(18px,2.5vw,24px)", fontWeight: 800, color: theme.text, margin: "0 0 8px", fontFamily: "'DM Sans', sans-serif" }}>{step.title}</h3>
+              <p style={{ fontSize: 15, color: theme.textMuted, lineHeight: 1.6, margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>{step.desc}</p>
+              <p style={{ fontSize: 14, color: theme.textMuted, lineHeight: 1.7, margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{step.detail}</p>
             </div>
           </motion.div>
         ))}
 
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          style={{ background: COLORS.navy, borderRadius: 24, padding: 48, textAlign: "center", marginBottom: 64 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 900, color: COLORS.white, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 16px" }}>Ready to Get Started?</h2>
+          style={{ background: COLORS.navy, borderRadius: 24, padding: "clamp(32px,5vw,48px)", textAlign: "center", marginBottom: 64 }}>
+          <h2 style={{ fontSize: "clamp(24px,4vw,36px)", fontWeight: 900, color: COLORS.white, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 16px" }}>Ready to Get Started?</h2>
           <p style={{ color: "rgba(255,255,255,0.65)", fontFamily: "'DM Sans', sans-serif", marginBottom: 28 }}>Book your first nurse in under 2 minutes.</p>
           <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={() => navigate("/book")}
             style={{ background: COLORS.teal, color: COLORS.white, border: "none", borderRadius: 12, padding: "16px 40px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
@@ -64,12 +66,12 @@ export default function HowItWorksPage() {
         </motion.div>
 
         <div>
-          <h2 style={{ fontSize: 36, fontWeight: 900, color: COLORS.navy, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 32px" }}>Frequently Asked Questions</h2>
+          <h2 style={{ fontSize: "clamp(24px,4vw,36px)", fontWeight: 900, color: theme.text, fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 32px" }}>Frequently Asked Questions</h2>
           {FAQS.map((faq, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              style={{ background: COLORS.white, borderRadius: 16, padding: "24px 28px", marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}>
-              <h4 style={{ fontSize: 17, fontWeight: 800, color: COLORS.navy, margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif" }}>{faq.q}</h4>
-              <p style={{ fontSize: 15, color: COLORS.slate, lineHeight: 1.6, margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{faq.a}</p>
+              style={{ background: theme.bgCard, borderRadius: 16, padding: "24px 28px", marginBottom: 16, boxShadow: theme.shadow, border: `1px solid ${theme.border}`, transition: "background 0.3s" }}>
+              <h4 style={{ fontSize: 17, fontWeight: 800, color: theme.text, margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif" }}>{faq.q}</h4>
+              <p style={{ fontSize: 15, color: theme.textMuted, lineHeight: 1.6, margin: 0, fontFamily: "'DM Sans', sans-serif" }}>{faq.a}</p>
             </motion.div>
           ))}
         </div>
