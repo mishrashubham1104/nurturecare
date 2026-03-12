@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { COLORS, fadeUp, stagger, STATS } from "../constants";
 import { useApp } from "../context/AppContext";
-import BookingModal from "../components/BookingModal";
 
 function Section({ children, id, style = {} }) {
   const ref = useRef(null);
@@ -17,7 +16,6 @@ function Section({ children, id, style = {} }) {
 export default function HomePage() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 500], [0, 120]);
-  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const { fetchServices, services, fetchTestimonials, testimonials } = useApp();
 
@@ -57,7 +55,7 @@ export default function HomePage() {
               Professional, verified, and compassionate nurses delivered to your doorstep within hours.
             </motion.p>
             <motion.div variants={fadeUp} style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 48 }}>
-              <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={() => setModalOpen(true)}
+              <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={() => navigate("/caregivers")}
                 style={{ background: COLORS.teal, color: COLORS.white, border: "none", borderRadius: 12, padding: "16px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", boxShadow: "0 8px 32px rgba(0,169,157,0.35)" }}>
                 Book a Nurse →
               </motion.button>
@@ -115,8 +113,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* STATS */}
-      <div style={{ background: COLORS.teal, padding: "32px 48px" }}>
+      {/* STATS — hidden on mobile */}
+      <div className="stats-bar" style={{ background: COLORS.teal, padding: "32px 48px" }}>
         <div className="stats-grid" style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
           {STATS.map(({ value, label }) => (
             <div key={label} style={{ textAlign: "center" }}>
@@ -194,7 +192,7 @@ export default function HomePage() {
           <h2 style={{ fontSize: 48, fontWeight: 900, color: COLORS.white, margin: "0 0 16px", fontFamily: "'Playfair Display', Georgia, serif" }}>Ready to Book Care?</h2>
           <p style={{ fontSize: 18, color: "rgba(255,255,255,0.8)", margin: "0 0 40px", fontFamily: "'DM Sans', sans-serif" }}>Get a verified nurse at your door within 2–4 hours. Available 24/7, 365 days.</p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => setModalOpen(true)}
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => navigate("/caregivers")}
               style={{ background: COLORS.white, color: COLORS.teal, border: "none", borderRadius: 12, padding: "16px 36px", fontSize: 16, fontWeight: 800, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
               📅 Book Now
             </motion.button>
@@ -206,11 +204,10 @@ export default function HomePage() {
         </motion.div>
       </Section>
 
-      <BookingModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
       {/* Floating CTA */}
       <motion.button initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2 }}
-        whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} onClick={() => setModalOpen(true)}
+        whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/caregivers")}
         style={{ position: "fixed", bottom: 32, right: 32, background: COLORS.teal, color: COLORS.white,
           border: "none", borderRadius: 20, padding: "14px 24px", fontSize: 15, fontWeight: 800,
           cursor: "pointer", fontFamily: "'DM Sans', sans-serif", boxShadow: "0 8px 32px rgba(0,169,157,0.45)", zIndex: 99 }}>

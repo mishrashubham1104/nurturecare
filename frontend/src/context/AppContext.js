@@ -27,7 +27,9 @@ export function AppProvider({ children }) {
   const fetchTestimonials = useCallback(async () => {
     if (testimonials.length) return;
     const { data } = await axios.get(`${API_BASE}/testimonials`);
-    setTestimonials(data);
+    /* backend returns { success: true, data: [...] } */
+    const arr = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+    setTestimonials(arr);
   }, [testimonials.length]);
 
   const fetchPricing = useCallback(async () => {

@@ -84,10 +84,11 @@ function AppShell() {
           .contact-grid{grid-template-columns:1fr!important}
           .service-detail-grid{grid-template-columns:1fr!important}
         }
-        @media(max-width:560px){
+        @media(max-width:600px){
           .services-grid{grid-template-columns:1fr!important}
           .pricing-grid{grid-template-columns:1fr!important}
           .caregivers-grid{grid-template-columns:1fr!important}
+          .stats-bar{display:none!important}
         }
       `}</style>
       <BrowserRouter>

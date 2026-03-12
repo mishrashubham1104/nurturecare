@@ -5,31 +5,53 @@ import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const [scrolled, setScrolled]     = useState(false);
-  const [menuOpen, setMenuOpen]     = useState(false);
-  const [userMenu, setUserMenu]     = useState(false);
-  const theme                       = useTheme();
-  const { user, isLoggedIn, logout} = useAuth();
-  const navigate                    = useNavigate();
-  const location                    = useLocation();
-  const isHome                      = location.pathname === "/";
+  const [scrolled,  setScrolled]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [userMenu,  setUserMenu]  = useState(false);
+  const [isMobile,  setIsMobile]  = useState(false);
+  const theme                     = useTheme();
+  const { user, isLoggedIn, logout } = useAuth();
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const isHome    = location.pathname === "/";
 
+  /* ── Scroll listener ── */
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  // Close menus on route change
+  /* ── Mobile detection — JS-driven, 100% reliable ── */
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 900);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  /* ── Close menus on route change ── */
   useEffect(() => { setMenuOpen(false); setUserMenu(false); }, [location.pathname]);
 
+  /* ── Close drawer on outside click ── */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const fn = (e) => {
+      if (!e.target.closest(".mobile-drawer") && !e.target.closest(".hamburger-btn")) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, [menuOpen]);
+
   const navLinks = [
-    { label: "Services",      path: "/services" },
-    { label: "How It Works",  path: "/how-it-works" },
-    { label: "Caregivers",    path: "/caregivers" },
-    { label: "Testimonials",  path: "/testimonials" },
-    { label: "Pricing",       path: "/pricing" },
-    { label: "Contact",       path: "/contact" },
+    { label: "Services",     path: "/services"     },
+    { label: "How It Works", path: "/how-it-works" },
+    { label: "Caregivers",   path: "/caregivers"   },
+    { label: "Testimonials", path: "/testimonials" },
+    { label: "Pricing",      path: "/pricing"      },
+    { label: "Contact",      path: "/contact"      },
   ];
 
   const navBg = scrolled || !isHome
@@ -38,146 +60,235 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav initial={{ y: -80 }} animate={{ y: 0 }} transition={{ duration: 0.6 }}
-        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-          background: navBg, backdropFilter: scrolled ? "blur(14px)" : "none",
+      <motion.nav
+        initial={{ y: -80 }} animate={{ y: 0 }} transition={{ duration: 0.6 }}
+        style={{
+          position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+          background: navBg,
+          backdropFilter: scrolled ? "blur(14px)" : "none",
           boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.25)" : "none",
-          transition: "all 0.3s ease", padding: "0 32px", display: "flex",
-          alignItems: "center", justifyContent: "space-between", height: 68 }}>
-
-        {/* Logo */}
+          transition: "all 0.3s ease",
+          padding: isMobile ? "0 16px" : "0 32px",
+          display: "flex", alignItems: "center",
+          justifyContent: "space-between", height: 68,
+        }}
+      >
+        {/* ── Logo ── */}
         <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <motion.div whileHover={{ scale: 1.07 }} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#00A99D,#00CEC3)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🩺</div>
-            <span style={{ fontSize: 20, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif" }}>NurtureCare</span>
+            <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#00A99D,#00CEC3)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🩺</div>
+            <span style={{ fontSize: isMobile ? 17 : 20, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif" }}>NurtureCare</span>
           </motion.div>
         </Link>
 
-        {/* Desktop links */}
-        <div style={{ display: "flex", gap: 32, alignItems: "center", flexShrink: 0 }} className="desktop-nav">
-          {navLinks.map(({ label, path }) => (
-            <Link key={path} to={path} style={{ textDecoration: "none" }}>
-              <motion.span whileHover={{ color: "#00CEC3" }}
-                style={{ color: location.pathname === path ? "#00CEC3" : "rgba(255,255,255,0.8)",
-                  fontSize: 14, fontWeight: location.pathname === path ? 700 : 500,
-                  fontFamily: "'DM Sans', sans-serif", transition: "color 0.2s", cursor: "pointer",
-                  whiteSpace: "nowrap", letterSpacing: "0.01em" }}>
-                {label}
-              </motion.span>
-            </Link>
-          ))}
-        </div>
+        {/* ── Desktop nav links ── */}
+        {!isMobile && (
+          <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+            {navLinks.map(({ label, path }) => (
+              <Link key={path} to={path} style={{ textDecoration: "none" }}>
+                <motion.span
+                  whileHover={{ color: "#00CEC3" }}
+                  style={{
+                    color: location.pathname === path ? "#00CEC3" : "rgba(255,255,255,0.85)",
+                    fontSize: 14, fontWeight: location.pathname === path ? 700 : 500,
+                    fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                    whiteSpace: "nowrap", transition: "color 0.2s",
+                  }}
+                >
+                  {label}
+                </motion.span>
+              </Link>
+            ))}
+          </div>
+        )}
 
-        {/* Right side actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* Dark / Light Toggle */}
-          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={theme.toggle}
-            style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* ── Right actions ── */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+          {/* Theme toggle — always visible */}
+          <motion.button
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+            onClick={theme.toggle}
+            style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+          >
             {theme.isDark ? "☀️" : "🌙"}
           </motion.button>
 
-          {isLoggedIn ? (
-            <div style={{ position: "relative" }}>
-              <motion.button whileHover={{ scale: 1.05 }} onClick={() => setUserMenu(v => !v)}
-                style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(0,169,157,0.2)", border: "1px solid rgba(0,169,157,0.4)", borderRadius: 20, padding: "6px 14px 6px 6px", cursor: "pointer" }}>
-                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#00A99D,#00CEC3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", fontFamily: "'DM Sans', sans-serif" }}>
-                  {user?.name?.charAt(0).toUpperCase()}
-                </div>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {user?.name?.split(" ")[0]}
-                </span>
-                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10 }}>▼</span>
-              </motion.button>
-
-              <AnimatePresence>
-                {userMenu && (
-                  <motion.div initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                    style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: theme.bgCard, borderRadius: 16, padding: 8, minWidth: 180, boxShadow: theme.shadowLg, border: `1px solid ${theme.border}`, zIndex: 200 }}>
-                    <div style={{ padding: "10px 14px", borderBottom: `1px solid ${theme.border}`, marginBottom: 4 }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: theme.text, fontFamily: "'DM Sans', sans-serif" }}>{user?.name}</div>
-                      <div style={{ fontSize: 12, color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}>{user?.email}</div>
-                    </div>
-                    {[["📅 My Bookings", "/my-bookings"], ["👤 Profile", "/profile"]].map(([label, path]) => (
-                      <button key={path} onClick={() => navigate(path)}
-                        style={{ display: "block", width: "100%", padding: "10px 14px", background: "none", border: "none", textAlign: "left", color: theme.text, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", borderRadius: 10 }}>
-                        {label}
+          {/* Desktop auth buttons */}
+          {!isMobile && (
+            isLoggedIn ? (
+              <div style={{ position: "relative" }}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => setUserMenu(v => !v)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(0,169,157,0.2)", border: "1px solid rgba(0,169,157,0.4)", borderRadius: 20, padding: "6px 14px 6px 6px", cursor: "pointer" }}
+                >
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#00A99D,#00CEC3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff", fontFamily: "'DM Sans', sans-serif" }}>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <span style={{ color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {user?.name?.split(" ")[0]}
+                  </span>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10 }}>▼</span>
+                </motion.button>
+                <AnimatePresence>
+                  {userMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                      style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: theme.bgCard, borderRadius: 16, padding: 8, minWidth: 180, boxShadow: theme.shadowLg, border: `1px solid ${theme.border}`, zIndex: 200 }}
+                    >
+                      <div style={{ padding: "10px 14px", borderBottom: `1px solid ${theme.border}`, marginBottom: 4 }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: theme.text, fontFamily: "'DM Sans', sans-serif" }}>{user?.name}</div>
+                        <div style={{ fontSize: 12, color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}>{user?.email}</div>
+                      </div>
+                      {[["📅 My Bookings", "/my-bookings"], ["👤 Profile", "/profile"]].map(([label, path]) => (
+                        <button key={path} onClick={() => { navigate(path); setUserMenu(false); }}
+                          style={{ display: "block", width: "100%", padding: "10px 14px", background: "none", border: "none", textAlign: "left", color: theme.text, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", borderRadius: 10 }}>
+                          {label}
+                        </button>
+                      ))}
+                      <button onClick={() => { logout(); navigate("/"); }}
+                        style={{ display: "block", width: "100%", padding: "10px 14px", background: "none", border: "none", textAlign: "left", color: "#FF6B8A", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", borderRadius: 10 }}>
+                        🚪 Sign Out
                       </button>
-                    ))}
-                    <button onClick={() => { logout(); navigate("/"); }}
-                      style={{ display: "block", width: "100%", padding: "10px 14px", background: "none", border: "none", textAlign: "left", color: "#FF6B8A", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", borderRadius: 10 }}>
-                      🚪 Sign Out
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: 8 }}>
-              <motion.button whileHover={{ scale: 1.04 }} onClick={() => navigate("/login")}
-                style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-                Sign In
-              </motion.button>
-              <motion.button whileHover={{ scale: 1.04 }} onClick={() => navigate("/book")}
-                style={{ background: "#00A99D", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-                Book Now
-              </motion.button>
-            </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <motion.button whileHover={{ scale: 1.04 }} onClick={() => navigate("/login")}
+                  style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  Sign In
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.04 }} onClick={() => navigate("/book")}
+                  style={{ background: "#00A99D", color: "#fff", border: "none", borderRadius: 10, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                  Book Now
+                </motion.button>
+              </div>
+            )
           )}
 
-          {/* Hamburger */}
-          <motion.button whileHover={{ scale: 1.1 }} onClick={() => setMenuOpen(v => !v)}
-            style={{ display: "none", width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.1)", border: "none", cursor: "pointer", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5 }}
-            className="hamburger">
-            {[0, 1, 2].map(i => (
-              <motion.span key={i}
-                animate={{ rotate: menuOpen && i === 0 ? 45 : menuOpen && i === 2 ? -45 : 0, y: menuOpen && i === 0 ? 8 : menuOpen && i === 2 ? -8 : 0, opacity: menuOpen && i === 1 ? 0 : 1 }}
-                style={{ display: "block", width: 22, height: 2, background: "#fff", borderRadius: 2 }} />
-            ))}
-          </motion.button>
+          {/* ── Hamburger — only on mobile, JS-driven ── */}
+          {isMobile && (
+            <button
+              className="hamburger-btn"
+              onClick={() => setMenuOpen(v => !v)}
+              style={{
+                width: 42, height: 42, borderRadius: 10,
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                cursor: "pointer", display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", gap: 5,
+                flexShrink: 0,
+              }}
+            >
+              <span style={{
+                display: "block", width: 22, height: 2, background: "#fff", borderRadius: 2,
+                transformOrigin: "center",
+                transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none",
+                transition: "transform 0.25s ease",
+              }} />
+              <span style={{
+                display: "block", width: 22, height: 2, background: "#fff", borderRadius: 2,
+                opacity: menuOpen ? 0 : 1,
+                transition: "opacity 0.2s ease",
+              }} />
+              <span style={{
+                display: "block", width: 22, height: 2, background: "#fff", borderRadius: 2,
+                transformOrigin: "center",
+                transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none",
+                transition: "transform 0.25s ease",
+              }} />
+            </button>
+          )}
         </div>
       </motion.nav>
 
-      {/* Mobile Drawer */}
+      {/* ── Mobile Drawer ── */}
       <AnimatePresence>
-        {menuOpen && (
+        {menuOpen && isMobile && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 98 }} />
-            <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25 }}
-              style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "80%", maxWidth: 320, background: theme.bgCard, zIndex: 99, padding: "80px 24px 40px", display: "flex", flexDirection: "column", gap: 4, overflowY: "auto" }}>
-              {navLinks.map(({ label, path }) => (
-                <Link key={path} to={path} style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
-                  <motion.div whileHover={{ x: 4 }}
-                    style={{ padding: "14px 16px", borderRadius: 12, fontSize: 16, fontWeight: location.pathname === path ? 800 : 600,
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 98 }}
+            />
+
+            {/* Drawer panel */}
+            <motion.div
+              key="drawer"
+              className="mobile-drawer"
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              style={{
+                position: "fixed", top: 0, right: 0, bottom: 0,
+                width: "78%", maxWidth: 310,
+                background: theme.bgCard,
+                zIndex: 99,
+                display: "flex", flexDirection: "column",
+                overflowY: "auto",
+              }}
+            >
+              {/* Drawer header */}
+              <div style={{ padding: "20px 20px 12px", borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 30, height: 30, background: "linear-gradient(135deg,#00A99D,#00CEC3)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>🩺</div>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: theme.text, fontFamily: "'Playfair Display', Georgia, serif" }}>NurtureCare</span>
+                </div>
+                <button onClick={() => setMenuOpen(false)}
+                  style={{ width: 32, height: 32, borderRadius: 8, background: theme.bgSecondary, border: `1px solid ${theme.border}`, cursor: "pointer", fontSize: 16, color: theme.text, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  ✕
+                </button>
+              </div>
+
+              {/* Nav links */}
+              <div style={{ padding: "12px 12px", flex: 1 }}>
+                {navLinks.map(({ label, path }) => (
+                  <Link key={path} to={path} style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
+                    <div style={{
+                      padding: "13px 16px", borderRadius: 12, marginBottom: 4,
+                      fontSize: 15, fontWeight: location.pathname === path ? 800 : 600,
                       color: location.pathname === path ? "#00A99D" : theme.text,
                       background: location.pathname === path ? "rgba(0,169,157,0.1)" : "transparent",
-                      fontFamily: "'DM Sans', sans-serif" }}>
-                    {label}
-                  </motion.div>
-                </Link>
-              ))}
-              <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
+                      fontFamily: "'DM Sans', sans-serif",
+                      borderLeft: location.pathname === path ? "3px solid #00A99D" : "3px solid transparent",
+                      transition: "all 0.15s",
+                    }}>
+                      {label}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Auth footer */}
+              <div style={{ padding: "12px 12px 28px", borderTop: `1px solid ${theme.border}`, display: "flex", flexDirection: "column", gap: 10 }}>
                 {isLoggedIn ? (
                   <>
-                    <div style={{ padding: "12px 16px", background: "rgba(0,169,157,0.1)", borderRadius: 12 }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: theme.text, fontFamily: "'DM Sans', sans-serif" }}>👤 {user?.name}</div>
-                      <div style={{ fontSize: 12, color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}>{user?.email}</div>
+                    <div style={{ padding: "12px 16px", background: "rgba(0,169,157,0.08)", borderRadius: 12, border: "1px solid rgba(0,169,157,0.2)" }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: theme.text, fontFamily: "'DM Sans', sans-serif" }}>👤 {user?.name}</div>
+                      <div style={{ fontSize: 11, color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}>{user?.email}</div>
                     </div>
+                    <button onClick={() => { navigate("/my-bookings"); setMenuOpen(false); }}
+                      style={{ padding: "13px", borderRadius: 12, background: theme.bgSecondary, border: `1px solid ${theme.border}`, color: theme.text, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                      📅 My Bookings
+                    </button>
                     <button onClick={() => { logout(); navigate("/"); setMenuOpen(false); }}
-                      style={{ padding: "14px", borderRadius: 12, background: "rgba(255,107,138,0.1)", border: "1px solid rgba(255,107,138,0.3)", color: "#FF6B8A", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                      style={{ padding: "13px", borderRadius: 12, background: "rgba(255,107,138,0.1)", border: "1px solid rgba(255,107,138,0.3)", color: "#FF6B8A", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                       Sign Out
                     </button>
                   </>
                 ) : (
                   <>
                     <button onClick={() => { navigate("/login"); setMenuOpen(false); }}
-                      style={{ padding: "14px", borderRadius: 12, background: "transparent", border: `1px solid ${theme.border}`, color: theme.text, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                      style={{ padding: "13px", borderRadius: 12, background: "transparent", border: `1px solid ${theme.border}`, color: theme.text, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                       Sign In
                     </button>
                     <button onClick={() => { navigate("/book"); setMenuOpen(false); }}
-                      style={{ padding: "14px", borderRadius: 12, background: "#00A99D", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
-                      Book a Nurse
+                      style={{ padding: "13px", borderRadius: 12, background: "#00A99D", border: "none", color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+                      Book a Nurse 🩺
                     </button>
                   </>
                 )}
@@ -186,13 +297,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .desktop-nav { display: none !important; }
-          .hamburger   { display: flex !important; }
-        }
-      `}</style>
     </>
   );
 }
