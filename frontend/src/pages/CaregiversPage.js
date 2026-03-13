@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { COLORS, API_BASE, fadeUp, stagger } from "../constants";
@@ -55,7 +55,7 @@ export default function CaregiversPage() {
   // For direct-booking from profile page
   const [booking, setBooking] = useState({ open: false, cg: null, sent: false, loading: false, error: "" });
 
-  useEffect(() => { fetchCaregivers(); }, [fetchCaregivers]);
+  useEffect(() => { fetchCaregivers(); }, [fetchCaregivers]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Find the right caregiver by _id ── */
   const caregiver = (id && caregivers?.length)
@@ -130,7 +130,6 @@ export default function CaregiversPage() {
               <div style={{ margin: "0 auto 16px", width: "fit-content" }}>
                 <Avatar name={caregiver.name} size={130} />
               </div>
-              {/* Verified badge */}
               {caregiver.status === "verified" && (
                 <div style={{ background: "rgba(0,169,157,0.15)", color: COLORS.teal, fontSize: 11, fontWeight: 700, borderRadius: 20, padding: "4px 12px", display: "inline-block", fontFamily: "'DM Sans',sans-serif", marginBottom: 12 }}>
                   ✅ Verified
@@ -294,7 +293,6 @@ export default function CaregiversPage() {
               whileHover={{ y: -8, boxShadow: theme.shadowLg }}
               style={{ background: theme.bgCard, borderRadius: 20, padding: 24, border: `1px solid ${theme.border}`, transition: "background 0.3s", display: "flex", flexDirection: "column" }}>
 
-              {/* Avatar */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 16 }}>
                 <Avatar name={cg.name} size={80} />
                 {cg.status === "verified" && (
@@ -318,7 +316,6 @@ export default function CaregiversPage() {
                 <AvailBadge isAvailable={cg.isAvailable} hours={cg.availableHours} theme={theme} />
               </div>
 
-              {/* Specialization pills */}
               {cg.specializations?.length > 0 && (
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
                   {cg.specializations.slice(0, 2).map(s => (
