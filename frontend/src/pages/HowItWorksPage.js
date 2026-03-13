@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { COLORS, fadeUp } from "../constants";
+import { COLORS } from "../constants";
 import { useTheme } from "../context/ThemeContext";
 
 const STEPS = [

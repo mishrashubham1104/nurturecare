@@ -5,7 +5,6 @@ import { useApp } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 
 export default function FeedbackPage() {
-  const { loading } = useApp();
   const theme = useTheme();
   const [form, setForm]         = useState({ name: "", email: "", rating: 0, category: "", feedback: "" });
   const [hover, setHover]       = useState(0);

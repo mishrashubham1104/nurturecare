@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { COLORS, fadeUp } from "../constants";
+import { COLORS } from "../constants";
 import { useApp } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 

@@ -11,7 +11,7 @@ export default function PricingPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
-  useEffect(() => { fetchPricing(); }, []);
+  useEffect(() => { fetchPricing(); }, [fetchPricing]);
 
   return (
     <div style={{ background: theme.bg, minHeight: "100vh", paddingTop: 100, transition: "background 0.3s" }}>

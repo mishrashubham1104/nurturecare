@@ -55,7 +55,7 @@ export default function CaregiversPage() {
   // For direct-booking from profile page
   const [booking, setBooking] = useState({ open: false, cg: null, sent: false, loading: false, error: "" });
 
-  useEffect(() => { fetchCaregivers(); }, []);
+  useEffect(() => { fetchCaregivers(); }, [fetchCaregivers]);
 
   /* ── Find the right caregiver by _id ── */
   const caregiver = (id && caregivers?.length)

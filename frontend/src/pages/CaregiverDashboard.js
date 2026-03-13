@@ -105,14 +105,14 @@ export default function CaregiverDashboard() {
   const lbl = { display: "block", fontSize: 12, fontWeight: 700, color: theme.textMuted, marginBottom: 6, fontFamily: "'DM Sans',sans-serif" };
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", minHeight: "100dvh", background: theme.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ minHeight: "100dvh", background: theme.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         style={{ width: 40, height: 40, border: `3px solid ${theme.border}`, borderTopColor: "#00A99D", borderRadius: "50%" }} />
     </div>
   );
 
   return (
-    <div style={{ background: theme.bg, minHeight: "100vh", minHeight: "100dvh" }}>
+    <div style={{ background: theme.bg, minHeight: "100dvh" }}>
 
       {/* Toast */}
       <AnimatePresence>

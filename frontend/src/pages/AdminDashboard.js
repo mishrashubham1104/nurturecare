@@ -135,7 +135,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div style={{ background: theme.bg, minHeight: "100vh", minHeight: "100dvh" }}>
+    <div style={{ background: theme.bg, minHeight: "100dvh" }}>
 
       {/* Toast */}
       <AnimatePresence>

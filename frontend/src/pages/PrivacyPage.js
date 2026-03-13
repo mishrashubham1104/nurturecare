@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { COLORS, fadeUp } from "../constants";
+import { COLORS } from "../constants";
 
 const SECTIONS = [
   { title: "1. Information We Collect", content: "We collect information you provide directly to us when creating an account, making a booking, or contacting us. This includes: your name, email address, phone number, home address, and health-related information about the patient requiring care. We also collect payment information (processed securely through our payment partners), device and usage data when you use our website or app, and location data to dispatch caregivers." },
