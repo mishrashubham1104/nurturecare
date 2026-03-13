@@ -15,22 +15,13 @@ const app        = express();
 const PORT       = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "NurtureCare_secret_key_change_in_production";
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  CORS  ← THIS WAS THE BUG
-//  Old code was: app.use(cors())
-//  That causes ERR_CONNECTION_REFUSED / Network Error from Vercel in production.
-//
-//  Fix: whitelist your Vercel URL explicitly.
-//  On Render → Environment → add:
-//    FRONTEND_URL = https://your-app.vercel.app   (no trailing slash)
-// ══════════════════════════════════════════════════════════════════════════════
 const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL,         // set this env var on Render
-  /https:\/\/.+\.vercel\.app$/,     // all Vercel preview/branch URLs
+  process.env.FRONTEND_URL,         
+  /https:\/\/.+\.vercel\.app$/,    
   "http://localhost:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3000",
-].filter(Boolean);                  // removes undefined if FRONTEND_URL not set yet
+].filter(Boolean);                  
 
 app.use(cors({
   origin: (incomingOrigin, callback) => {
@@ -47,7 +38,7 @@ app.use(cors({
   methods:        ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-app.options("*", cors()); // Handle preflight for every route
+app.options("*", cors()); 
 
 app.use(bodyParser.json());
 
