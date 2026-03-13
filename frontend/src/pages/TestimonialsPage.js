@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { COLORS, fadeUp, stagger } from "../constants";
+import { COLORS } from "../constants";
 import { useApp } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";

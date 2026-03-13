@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { COLORS, fadeUp, stagger } from "../constants";
 import { useApp } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
@@ -10,7 +10,7 @@ export default function ServicesPage() {
   const { services, fetchServices } = useApp();
   const navigate = useNavigate();
   const theme = useTheme();
-  useEffect(() => { fetchServices(); }, []);
+  useEffect(() => { fetchServices(); }, [fetchServices]);
 
   const service = slug ? services.find(s => s.slug === slug) : null;
 
