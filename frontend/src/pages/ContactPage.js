@@ -42,7 +42,7 @@ export default function ContactPage() {
       <div style={{ maxWidth: 1100, margin: "-32px auto 0", padding: "0 clamp(16px,4vw,24px) 96px" }}>
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 32 }}>
           <div>
-            {[["📞","Call Us","1800-NURTURE-C (1800-687-8873)","Available 24/7"],["📧","Email","hello@nurturecare.in","Response within 1 hour"],["📍","Head Office","12th Floor, Lotus Tower, BKC, Mumbai 400051","Mon–Sat, 9AM–8PM"],["💬","WhatsApp","wa.me/918888NURTURE","Chat instantly"]].map(([icon,title,val,sub]) => (
+            {[["📞","Call Us","1800-NURTURE-C (1800-687-8873)","Available 24/7"],["📧","Email","hello@NurtureCare.in","Response within 1 hour"],["📍","Head Office","12th Floor, Lotus Tower, BKC, Mumbai 400051","Mon–Sat, 9AM–8PM"],["💬","WhatsApp","wa.me/918888NURTURE","Chat instantly"]].map(([icon,title,val,sub]) => (
               <motion.div key={title} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                 style={{ background: theme.bgCard, borderRadius: 16, padding: 24, marginBottom: 16, display: "flex", gap: 16, alignItems: "flex-start", border: `1px solid ${theme.border}`, transition: "background 0.3s" }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: theme.isDark ? "rgba(0,169,157,0.15)" : "#E8F6FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>

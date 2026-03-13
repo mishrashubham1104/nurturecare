@@ -13,7 +13,7 @@ const {
 
 const app        = express();
 const PORT       = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || "nurturecare_secret_key_change_in_production";
+const JWT_SECRET = process.env.JWT_SECRET || "NurtureCare_secret_key_change_in_production";
 
 app.use(cors());
 app.use(bodyParser.json());

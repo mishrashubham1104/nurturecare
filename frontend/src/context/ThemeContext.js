@@ -5,12 +5,12 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   // --- Dark Mode Logic ---
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("nurturecare_theme");
+    const saved = localStorage.getItem("NurtureCare_theme");
     return saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   useEffect(() => {
-    localStorage.setItem("nurturecare_theme", isDark ? "dark" : "light");
+    localStorage.setItem("NurtureCare_theme", isDark ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
   }, [isDark]);
 

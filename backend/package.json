@@ -1,5 +1,5 @@
 {
-  "name": "nurturecare-backend",
+  "name": "NurtureCare-backend",
   "version": "3.0.0",
   "description": "NurtureCare API — MongoDB Atlas + JWT Auth",
   "main": "server.js",

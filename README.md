@@ -4,7 +4,7 @@ A nursing care platform built with **React.js** (frontend) + **Node.js/Express**
 
 ## Project Structure
 ```
-nurturecare/
+NurtureCare/
 ├── frontend/          # React.js app
 │   ├── public/
 │   │   └── index.html

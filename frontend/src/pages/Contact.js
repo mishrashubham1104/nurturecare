@@ -43,7 +43,7 @@ export default function Contact() {
 
           {[
             { icon: "📞", title: "Helpline", value: "1800-NURTURE-C", sub: "Available 24/7" },
-            { icon: "📧", title: "Email", value: "care@nurturecare.in", sub: "Response within 2 hours" },
+            { icon: "📧", title: "Email", value: "care@NurtureCare.in", sub: "Response within 2 hours" },
             { icon: "📍", title: "Head Office", value: "Bandra West, Mumbai", sub: "Maharashtra, 400050" },
             { icon: "⏰", title: "Hours", value: "24 × 7 × 365", sub: "We never sleep" },
           ].map((item) => (
