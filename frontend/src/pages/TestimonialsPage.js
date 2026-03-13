@@ -76,7 +76,7 @@ export default function TestimonialsPage() {
   const timerRef                        = useRef(null);
 
   /* ── Load cards ── */
-  useEffect(() => {
+  useEffect(() => { // eslint-disable-line react-hooks/exhaustive-deps
     fetchTestimonials();
     const load = async () => {
       try {
@@ -92,14 +92,14 @@ export default function TestimonialsPage() {
       }
     };
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
+  useEffect(() => { // eslint-disable-line react-hooks/exhaustive-deps
     if (all.length === 0 && Array.isArray(ctxT) && ctxT.length > 0) {
       const ids = new Set(ctxT.map(t => t.id));
       setAll([...ctxT, ...EXTRA.filter(e => !ids.has(e.id))]);
     }
-  }, [ctxT]);
+  }, [ctxT]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Auto-rotate — same 4s interval as HomePage ── */
   useEffect(() => {
@@ -109,11 +109,10 @@ export default function TestimonialsPage() {
       setActive(a => (a + 1) % all.length);
     }, 4000);
     return () => clearInterval(timerRef.current);
-  }, [all.length]);
+  }, [all.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goTo = (i) => {
     setActive(i);
-    /* reset timer so it doesn't immediately jump after manual tap */
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setActive(a => (a + 1) % all.length);
@@ -149,18 +148,11 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════════════
-          CAROUSEL SECTION — EXACT same look as HomePage
-          "Families Trust NurtureCare" block.
-          On MOBILE this is the ONLY view (grid is hidden).
-          On DESKTOP this sits above the full grid.
-          ════════════════════════════════════════════════════ */}
+      {/* ── Carousel ── */}
       <div style={{ background: "linear-gradient(135deg,#0B1D3A 0%,#0d2d4a 100%)", padding: "clamp(48px,7vw,96px) clamp(20px,5vw,48px)" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-
           {all.length > 0 ? (
             <>
-              {/* ── Active card — IDENTICAL markup to HomePage ── */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTestimonial}
@@ -168,24 +160,12 @@ export default function TestimonialsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -30 }}
                   transition={{ duration: 0.5 }}
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 24,
-                    padding: "clamp(24px,5vw,48px)",
-                  }}
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, padding: "clamp(24px,5vw,48px)" }}
                 >
                   <div style={{ fontSize: 36, marginBottom: 16 }}>
                     {"⭐".repeat(Math.min(all[activeTestimonial].stars, 5))}
                   </div>
-                  <p style={{
-                    fontSize: "clamp(16px,2.5vw,22px)",
-                    color: COLORS.white,
-                    lineHeight: 1.7,
-                    margin: "0 0 28px",
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontStyle: "italic",
-                  }}>
+                  <p style={{ fontSize: "clamp(16px,2.5vw,22px)", color: COLORS.white, lineHeight: 1.7, margin: "0 0 28px", fontFamily: "'Playfair Display', Georgia, serif", fontStyle: "italic" }}>
                     "{all[activeTestimonial].text}"
                   </p>
                   <div style={{ fontWeight: 800, color: COLORS.teal, fontFamily: "'DM Sans', sans-serif", fontSize: 15 }}>
@@ -197,20 +177,13 @@ export default function TestimonialsPage() {
                   </div>
                 </motion.div>
               </AnimatePresence>
-
-              {/* ── Dots — IDENTICAL to HomePage ── */}
               <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 28, flexWrap: "wrap" }}>
                 {all.map((_, i) => (
                   <motion.button
-                    key={i}
-                    onClick={() => goTo(i)}
+                    key={i} onClick={() => goTo(i)}
                     animate={{ width: i === activeTestimonial ? 28 : 8 }}
                     transition={{ duration: 0.3 }}
-                    style={{
-                      height: 8, borderRadius: 4,
-                      background: i === activeTestimonial ? COLORS.teal : "rgba(255,255,255,0.2)",
-                      border: "none", cursor: "pointer", padding: 0,
-                    }}
+                    style={{ height: 8, borderRadius: 4, background: i === activeTestimonial ? COLORS.teal : "rgba(255,255,255,0.2)", border: "none", cursor: "pointer", padding: 0 }}
                   />
                 ))}
               </div>
@@ -221,7 +194,7 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      {/* ── Full grid — hidden on mobile, visible on tablet+ ── */}
+      {/* ── Full grid ── */}
       <div className="t-grid-section" style={{ background: theme.bg, padding: "clamp(48px,6vw,80px) clamp(20px,5vw,48px)", transition: "background 0.3s" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <motion.div
@@ -240,7 +213,6 @@ export default function TestimonialsPage() {
       </div>
 
       <style>{`
-        /* On mobile: hide the full grid — carousel is enough */
         @media (max-width: 600px) {
           .t-grid-section { display: none !important; }
         }

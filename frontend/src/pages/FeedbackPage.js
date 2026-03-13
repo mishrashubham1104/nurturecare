@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { COLORS } from "../constants";
-import { useApp } from "../context/AppContext";
 import { useTheme } from "../context/ThemeContext";
 
 export default function FeedbackPage() {
   const theme = useTheme();
-  const [form, setForm]         = useState({ name: "", email: "", rating: 0, category: "", feedback: "" });
-  const [hover, setHover]       = useState(0);
+  const [form, setForm]           = useState({ name: "", email: "", rating: 0, category: "", feedback: "" });
+  const [hover, setHover]         = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
   const CATEGORIES = ["Nurse Quality", "Booking Experience", "App / Website", "Payment", "Customer Support", "General Feedback"];

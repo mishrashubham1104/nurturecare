@@ -19,7 +19,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { fetchServices, services, fetchTestimonials, testimonials } = useApp();
 
-  useEffect(() => { fetchServices(); fetchTestimonials(); }, []);
+  useEffect(() => { fetchServices(); fetchTestimonials(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* STATS — hidden on mobile */}
+      {/* STATS */}
       <div className="stats-bar" style={{ background: COLORS.teal, padding: "32px 48px" }}>
         <div className="stats-grid" style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
           {STATS.map(({ value, label }) => (
@@ -133,7 +133,7 @@ export default function HomePage() {
             <h2 style={{ fontSize: 48, fontWeight: 900, color: COLORS.navy, margin: "12px 0 16px", fontFamily: "'Playfair Display', Georgia, serif" }}>Comprehensive Home Care</h2>
           </motion.div>
           <div className="services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
-            {(services.length ? services : [{icon:"🏥",title:"Post-Surgery Care",desc:"Professional at-home recovery support.",color:"#E8F6FF"},{icon:"👴",title:"Elderly Care",desc:"Compassionate daily living assistance.",color:"#FFF0F5"},{icon:"🧑‍⚕️",title:"ICU at Home",desc:"Critical care at home.",color:"#F0FFF4"},{icon:"💊",title:"Medication Management",desc:"Timely medication administration.",color:"#FFFBEB"},{icon:"🩺",title:"Physiotherapy",desc:"In-home physiotherapy sessions.",color:"#F5F0FF"},{icon:"🧠",title:"Dementia Care",desc:"Specialized memory care.",color:"#FFF5F0"}]).map((svc, i) => (
+            {(services.length ? services : [{icon:"🏥",title:"Post-Surgery Care",desc:"Professional at-home recovery support.",color:"#E8F6FF"},{icon:"👴",title:"Elderly Care",desc:"Compassionate daily living assistance.",color:"#FFF0F5"},{icon:"🧑‍⚕️",title:"ICU at Home",desc:"Critical care at home.",color:"#F0FFF4"},{icon:"💊",title:"Medication Management",desc:"Timely medication administration.",color:"#FFFBEB"},{icon:"🩺",title:"Physiotherapy",desc:"In-home physiotherapy sessions.",color:"#F5F0FF"},{icon:"🧠",title:"Dementia Care",desc:"Specialized memory care.",color:"#FFF5F0"}]).map((svc) => (
               <motion.div key={svc.title} variants={fadeUp} whileHover={{ y: -8, boxShadow: "0 24px 60px rgba(0,0,0,0.12)" }}
                 onClick={() => navigate(`/services/${svc.slug || svc.title.toLowerCase().replace(/\s+/g,"-")}`)}
                 style={{ background: svc.color, borderRadius: 20, padding: 32, cursor: "pointer", border: "1px solid rgba(0,0,0,0.05)" }}>
@@ -203,7 +203,6 @@ export default function HomePage() {
           </div>
         </motion.div>
       </Section>
-
 
       {/* Floating CTA */}
       <motion.button initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2 }}
