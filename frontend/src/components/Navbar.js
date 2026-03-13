@@ -230,7 +230,7 @@ export default function Navbar() {
         <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <motion.div whileHover={{ scale: 1.07 }} style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#00A99D,#00CEC3)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🩺</div>
-            <span style={{ fontSize: isMobile ? 17 : 20, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif" }}>NurtureCare</span>
+            <span style={{ fontSize: isMobile ? 17 : 20, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif" }}>Elder-Care</span>
           </motion.div>
         </Link>
 
