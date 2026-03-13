@@ -15,7 +15,40 @@ const app        = express();
 const PORT       = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "NurtureCare_secret_key_change_in_production";
 
-app.use(cors());
+// ══════════════════════════════════════════════════════════════════════════════
+//  CORS  ← THIS WAS THE BUG
+//  Old code was: app.use(cors())
+//  That causes ERR_CONNECTION_REFUSED / Network Error from Vercel in production.
+//
+//  Fix: whitelist your Vercel URL explicitly.
+//  On Render → Environment → add:
+//    FRONTEND_URL = https://your-app.vercel.app   (no trailing slash)
+// ══════════════════════════════════════════════════════════════════════════════
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL,         // set this env var on Render
+  /https:\/\/.+\.vercel\.app$/,     // all Vercel preview/branch URLs
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+].filter(Boolean);                  // removes undefined if FRONTEND_URL not set yet
+
+app.use(cors({
+  origin: (incomingOrigin, callback) => {
+    // Allow requests with no origin: Postman, mobile apps, curl
+    if (!incomingOrigin) return callback(null, true);
+    const isAllowed = ALLOWED_ORIGINS.some(o =>
+      typeof o === "string" ? o === incomingOrigin : o.test(incomingOrigin)
+    );
+    if (isAllowed) return callback(null, true);
+    console.warn(`🚫 CORS blocked: ${incomingOrigin}`);
+    callback(new Error("CORS: origin not allowed"));
+  },
+  credentials:    true,
+  methods:        ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options("*", cors()); // Handle preflight for every route
+
 app.use(bodyParser.json());
 
 // ── MongoDB Atlas ──────────────────────────────────────────────────────────────
@@ -55,20 +88,17 @@ const caregiverSchema = new mongoose.Schema({
   bio:             { type: String, default: "" },
   licenseNumber:   { type: String, default: "" },
   idProof:         { type: String, default: "" },
-  // Verification
-  status:          { type: String, enum: ["pending", "verified", "rejected", "suspended"], default: "pending" },
-  verificationNote:{ type: String, default: "" },
-  verifiedAt:      { type: Date, default: null },
-  verifiedBy:      { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
-  // Availability
-  isAvailable:     { type: Boolean, default: true },
-  availableDays:   { type: [String], default: ["Mon","Tue","Wed","Thu","Fri"] },
-  availableHours:  { type: String, default: "9AM–6PM" },
-  // Earnings & stats
-  totalEarnings:   { type: Number, default: 0 },
-  totalJobs:       { type: Number, default: 0 },
-  rating:          { type: Number, default: 0 },
-  reviews:         { type: Number, default: 0 },
+  status:           { type: String, enum: ["pending", "verified", "rejected", "suspended"], default: "pending" },
+  verificationNote: { type: String, default: "" },
+  verifiedAt:       { type: Date, default: null },
+  verifiedBy:       { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+  isAvailable:    { type: Boolean, default: true },
+  availableDays:  { type: [String], default: ["Mon","Tue","Wed","Thu","Fri"] },
+  availableHours: { type: String, default: "9AM–6PM" },
+  totalEarnings:  { type: Number, default: 0 },
+  totalJobs:      { type: Number, default: 0 },
+  rating:         { type: Number, default: 0 },
+  reviews:        { type: Number, default: 0 },
 }, { timestamps: true });
 
 const bookingSchema = new mongoose.Schema({
@@ -86,9 +116,8 @@ const bookingSchema = new mongoose.Schema({
   careNotes:    { type: String, default: "" },
   status:       { type: String, enum: ["pending","confirmed","accepted","rejected","in_progress","completed","cancelled"], default: "confirmed" },
   earnings:     { type: Number, default: 0 },
-  // Complaint / dispute
-  hasComplaint: { type: Boolean, default: false },
-  complaint:    { type: String, default: "" },
+  hasComplaint:    { type: Boolean, default: false },
+  complaint:       { type: String, default: "" },
   complaintStatus: { type: String, enum: ["none","open","resolved"], default: "none" },
 }, { timestamps: true });
 
@@ -170,7 +199,6 @@ app.post("/api/auth/register", async (req, res) => {
     const exists = await User.findOne({ email: email.toLowerCase() });
     if (exists) return res.status(409).json({ error: "Account already exists with this email" });
     const hashed = await bcrypt.hash(password, 12);
-    // Only allow patient/caregiver self-registration; admin only via DB
     const allowedRole = ["patient","caregiver"].includes(role) ? role : "patient";
     const user = await User.create({ name: name.trim(), email: email.toLowerCase(), password: hashed, phone: phone || "", role: allowedRole });
     const token = jwt.sign({ id: user._id, email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
@@ -205,12 +233,18 @@ app.get("/api/auth/me", auth, async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 //  STATIC DATA ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
-app.get("/api/health", (req, res) => res.json({ status:"ok", db: mongoose.connection.readyState === 1 ? "connected":"disconnected" }));
+
+// /api/health now shows FRONTEND_URL so you can verify env vars are set on Render
+app.get("/api/health", (req, res) => res.json({
+  status: "ok",
+  db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  env: process.env.NODE_ENV || "development",
+  frontendUrl: process.env.FRONTEND_URL || "NOT SET ⚠️  — add FRONTEND_URL on Render",
+}));
 app.get("/api/services",     (req, res) => res.json(SERVICES));
 app.get("/api/testimonials", (req, res) => res.json(TESTIMONIALS));
 app.get("/api/pricing",      (req, res) => res.json(PRICING));
 
-// Public: list verified caregivers for patients to browse
 app.get("/api/caregivers", async (req, res) => {
   try {
     const list = await Caregiver.find({ status: "verified" }).sort({ rating: -1 });
@@ -219,10 +253,8 @@ app.get("/api/caregivers", async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  CAREGIVER ROUTES  (self-service for caregiver role)
+//  CAREGIVER ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
-
-// POST /api/caregiver/register  — caregiver completes their profile after account creation
 app.post("/api/caregiver/register", auth, caregiverOnly, async (req, res) => {
   try {
     const { role, experience, specializations, languages, serviceAreas, bio, licenseNumber, idProof } = req.body;
@@ -241,20 +273,12 @@ app.post("/api/caregiver/register", auth, caregiverOnly, async (req, res) => {
       status: "pending",
     });
     console.log("✅ Caregiver profile submitted | ID:", caregiverId);
-
-    // ── Notify admin by email ──────────────────────────────────────────────
-    try {
-      await sendAdminCaregiverNotification(cg);
-    } catch (emailErr) {
-      // Email failure must NOT block the API response
-      console.error("⚠️  Admin notification email failed:", emailErr.message);
-    }
-
+    try { await sendAdminCaregiverNotification(cg); }
+    catch (emailErr) { console.error("⚠️  Admin email failed:", emailErr.message); }
     res.status(201).json({ success: true, message: "Profile submitted. Pending admin verification.", caregiver: cg });
   } catch (err) { res.status(500).json({ error: "Failed to submit profile: " + err.message }); }
 });
 
-// GET /api/caregiver/profile
 app.get("/api/caregiver/profile", auth, caregiverOnly, async (req, res) => {
   try {
     const cg = await Caregiver.findOne({ userId: req.user.id });
@@ -263,7 +287,6 @@ app.get("/api/caregiver/profile", auth, caregiverOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch profile." }); }
 });
 
-// PATCH /api/caregiver/profile  — update own profile
 app.patch("/api/caregiver/profile", auth, caregiverOnly, async (req, res) => {
   try {
     const allowed = ["role","experience","specializations","languages","serviceAreas","bio","isAvailable","availableDays","availableHours","phone"];
@@ -275,7 +298,6 @@ app.patch("/api/caregiver/profile", auth, caregiverOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to update profile." }); }
 });
 
-// PATCH /api/caregiver/availability  — toggle available/busy
 app.patch("/api/caregiver/availability", auth, caregiverOnly, async (req, res) => {
   try {
     const { isAvailable, availableDays, availableHours } = req.body;
@@ -289,7 +311,6 @@ app.patch("/api/caregiver/availability", auth, caregiverOnly, async (req, res) =
   } catch { res.status(500).json({ error: "Failed to update availability." }); }
 });
 
-// GET /api/caregiver/requests  — service requests assigned to this caregiver
 app.get("/api/caregiver/requests", auth, caregiverOnly, async (req, res) => {
   try {
     const cg = await Caregiver.findOne({ userId: req.user.id });
@@ -299,7 +320,6 @@ app.get("/api/caregiver/requests", auth, caregiverOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch requests." }); }
 });
 
-// PATCH /api/caregiver/requests/:bookingId  — accept/reject/update status + care notes
 app.patch("/api/caregiver/requests/:bookingId", auth, caregiverOnly, async (req, res) => {
   try {
     const { status, careNotes } = req.body;
@@ -312,7 +332,6 @@ app.patch("/api/caregiver/requests/:bookingId", auth, caregiverOnly, async (req,
     if (careNotes) updates.careNotes = careNotes;
     const booking = await Booking.findOneAndUpdate({ bookingId: req.params.bookingId, caregiverId: cg._id }, updates, { new: true });
     if (!booking) return res.status(404).json({ error: "Booking not found or not assigned to you" });
-    // Update earnings when completed
     if (status === "completed") {
       await Caregiver.findByIdAndUpdate(cg._id, { $inc: { totalEarnings: booking.earnings || 999, totalJobs: 1 } });
     }
@@ -320,7 +339,6 @@ app.patch("/api/caregiver/requests/:bookingId", auth, caregiverOnly, async (req,
   } catch { res.status(500).json({ error: "Failed to update request." }); }
 });
 
-// GET /api/caregiver/earnings
 app.get("/api/caregiver/earnings", auth, caregiverOnly, async (req, res) => {
   try {
     const cg = await Caregiver.findOne({ userId: req.user.id });
@@ -338,7 +356,6 @@ app.post("/api/bookings", auth, async (req, res) => {
     const { patientName, service, date, phone, address, nurseId, nurseName, notes } = req.body;
     if (!patientName || !service || !phone) return res.status(400).json({ error: "patientName, service and phone are required" });
     const bookingId = genId("BK");
-    // If nurseId is provided, try to link caregiver
     let caregiverId = null;
     if (nurseId) {
       const cg = await Caregiver.findOne({ caregiverId: nurseId, status: "verified" });
@@ -386,7 +403,6 @@ app.patch("/api/bookings/:bookingId/status", auth, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to update booking." }); }
 });
 
-// POST /api/bookings/:bookingId/complaint
 app.post("/api/bookings/:bookingId/complaint", auth, async (req, res) => {
   try {
     const { complaint } = req.body;
@@ -404,8 +420,6 @@ app.post("/api/bookings/:bookingId/complaint", auth, async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 //  ADMIN ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
-
-// GET /api/admin/stats
 app.get("/api/admin/stats", auth, adminOnly, async (req, res) => {
   try {
     const [totalUsers, totalCaregivers, pendingCaregivers, verifiedCaregivers,
@@ -438,7 +452,6 @@ app.get("/api/admin/stats", auth, adminOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ error: "Failed to fetch stats." }); }
 });
 
-// GET /api/admin/users
 app.get("/api/admin/users", auth, adminOnly, async (req, res) => {
   try {
     const { role, search, limit = 20, page = 1 } = req.query;
@@ -453,7 +466,6 @@ app.get("/api/admin/users", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch users." }); }
 });
 
-// PATCH /api/admin/users/:userId  — activate/suspend
 app.patch("/api/admin/users/:userId", auth, adminOnly, async (req, res) => {
   try {
     const { isActive } = req.body;
@@ -463,7 +475,6 @@ app.patch("/api/admin/users/:userId", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to update user." }); }
 });
 
-// GET /api/admin/caregivers  — all caregivers (any status)
 app.get("/api/admin/caregivers", auth, adminOnly, async (req, res) => {
   try {
     const { status, search, limit = 20, page = 1 } = req.query;
@@ -478,7 +489,6 @@ app.get("/api/admin/caregivers", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch caregivers." }); }
 });
 
-// PATCH /api/admin/caregivers/:caregiverId/verify  — verify / reject / suspend
 app.patch("/api/admin/caregivers/:caregiverId/verify", auth, adminOnly, async (req, res) => {
   try {
     const { status, verificationNote } = req.body;
@@ -490,23 +500,14 @@ app.patch("/api/admin/caregivers/:caregiverId/verify", auth, adminOnly, async (r
       { new: true }
     );
     if (!cg) return res.status(404).json({ error: "Caregiver not found" });
-
-    // ── Email the caregiver about the decision ─────────────────────────────
     try {
-      if (status === "verified") {
-        await sendCaregiverApprovedEmail(cg, verificationNote);
-      } else if (status === "rejected") {
-        await sendCaregiverRejectedEmail(cg, verificationNote);
-      }
-    } catch (emailErr) {
-      console.error("⚠️  Caregiver decision email failed:", emailErr.message);
-    }
-
+      if (status === "verified")  await sendCaregiverApprovedEmail(cg, verificationNote);
+      if (status === "rejected")  await sendCaregiverRejectedEmail(cg, verificationNote);
+    } catch (emailErr) { console.error("⚠️  Decision email failed:", emailErr.message); }
     res.json({ success: true, caregiver: cg });
   } catch { res.status(500).json({ error: "Failed to update caregiver." }); }
 });
 
-// GET /api/admin/bookings  — all bookings
 app.get("/api/admin/bookings", auth, adminOnly, async (req, res) => {
   try {
     const { status, hasComplaint, limit = 20, page = 1 } = req.query;
@@ -521,7 +522,6 @@ app.get("/api/admin/bookings", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch bookings." }); }
 });
 
-// PATCH /api/admin/bookings/:bookingId/assign  — assign caregiver to booking
 app.patch("/api/admin/bookings/:bookingId/assign", auth, adminOnly, async (req, res) => {
   try {
     const { caregiverId } = req.body;
@@ -537,7 +537,6 @@ app.patch("/api/admin/bookings/:bookingId/assign", auth, adminOnly, async (req, 
   } catch { res.status(500).json({ error: "Failed to assign caregiver." }); }
 });
 
-// PATCH /api/admin/complaints/:bookingId/resolve
 app.patch("/api/admin/complaints/:bookingId/resolve", auth, adminOnly, async (req, res) => {
   try {
     const booking = await Booking.findOneAndUpdate(
@@ -550,7 +549,6 @@ app.patch("/api/admin/complaints/:bookingId/resolve", auth, adminOnly, async (re
   } catch { res.status(500).json({ error: "Failed to resolve complaint." }); }
 });
 
-// GET /api/admin/complaints
 app.get("/api/admin/complaints", auth, adminOnly, async (req, res) => {
   try {
     const { status } = req.query;
@@ -561,7 +559,6 @@ app.get("/api/admin/complaints", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch complaints." }); }
 });
 
-// GET /api/admin/contacts
 app.get("/api/admin/contacts", auth, adminOnly, async (req, res) => {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });
@@ -569,7 +566,6 @@ app.get("/api/admin/contacts", auth, adminOnly, async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch contacts." }); }
 });
 
-// PATCH /api/admin/contacts/:contactId/resolve
 app.patch("/api/admin/contacts/:contactId/resolve", auth, adminOnly, async (req, res) => {
   try {
     const c = await Contact.findByIdAndUpdate(req.params.contactId, { resolved: true }, { new: true });
@@ -585,7 +581,7 @@ app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
     if (!name || !email || !message) return res.status(400).json({ error: "name, email and message required" });
-    const c = await Contact.create({ contactId: genId("CT"), name: name.trim(), email: email.toLowerCase(), phone: phone||"", message: message.trim() });
+    await Contact.create({ contactId: genId("CT"), name: name.trim(), email: email.toLowerCase(), phone: phone||"", message: message.trim() });
     res.status(201).json({ success: true, message: "Thank you! We'll reach out within 1 hour." });
   } catch { res.status(500).json({ error: "Failed to save contact." }); }
 });
@@ -611,5 +607,6 @@ app.listen(PORT, () => {
   console.log(`\n🚀 NurtureCare API  →  http://localhost:${PORT}`);
   console.log(`🗄️  Database     : MongoDB Atlas`);
   console.log(`🔐 Auth         : JWT (patient / caregiver / admin)`);
+  console.log(`🌍 CORS origins : ${ALLOWED_ORIGINS.filter(o => typeof o === "string").join(", ")}`);
   console.log(`📦 Environment  : ${process.env.NODE_ENV || "development"}\n`);
 });
